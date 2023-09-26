@@ -18,10 +18,10 @@ const server = http.createServer((request, response) => {
       email: "johndoe@example.com",
     });
 
-    return response.end("Create users");
+    return response.writeHead(201).end("Create users");
   }
 
-  return response.end("Hello ignite");
+  return response.writeHead(404).end("Not found");
 });
 
 server.listen(3333);

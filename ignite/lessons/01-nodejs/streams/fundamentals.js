@@ -12,7 +12,7 @@
  * processing its content without keeping it all in memory.
  */
 
-import {Readable} from "node:stream";
+import {Readable, Transform, Writable} from "node:stream";
 
 // readable stream
 class OneToHundredStream extends Readable {
@@ -33,4 +33,25 @@ class OneToHundredStream extends Readable {
   }
 }
 
-new OneToHundredStream().pipe(process.stdout);
+// writable stream
+class MultiplyByTenStream extends Writable {
+  _write(chunk, encoding, callback) {
+    console.log(Number(chunk.toString()) * 10);
+    callback();
+  }
+}
+
+// transform stream
+class TransformNumberToNegative extends Transform {
+  _transform(chunk, encoding, callback) {
+    const transformed = Number(chunk.toString()) * -1;
+    callback(null, Buffer.from(String(transformed)));
+  }
+}
+
+//new OneToHundredStream().pipe(process.stdout);
+//new OneToHundredStream().pipe(new MultiplyByTenStream());
+
+new OneToHundredStream()
+  .pipe(new TransformNumberToNegative())
+  .pipe(new MultiplyByTenStream());

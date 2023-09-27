@@ -1,18 +1,29 @@
 import http from "node:http";
-import {Transform} from "node:stream";
+//import {Transform} from "node:stream";
 
-class TransformNumberToNegative extends Transform {
-  _transform(chunk, encoding, callback) {
-    const transformed = Number(chunk.toString()) * -1;
+// class TransformNumberToNegative extends Transform {
+//   _transform(chunk, encoding, callback) {
+//     const transformed = Number(chunk.toString()) * -1;
 
-    console.log(transformed);
+//     console.log(transformed);
 
-    callback(null, Buffer.from(String(transformed)));
+//     callback(null, Buffer.from(String(transformed)));
+//   }
+// }
+
+const server = http.createServer(async (request, response) => {
+  const buffers = [];
+
+  //while the for buffer isn't complete nothing else is executed
+  for await (const chunk of request) {
+    buffers.push(chunk);
   }
-}
 
-const server = http.createServer((request, response) => {
-  return request.pipe(new TransformNumberToNegative()).pipe(response);
+  const fullStreamContent = Buffer.concat(buffers).toString();
+
+  console.log(fullStreamContent);
+
+  return response.end(fullStreamContent);
 });
 
 server.listen(3334);
